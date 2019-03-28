@@ -1,3 +1,11 @@
+# tesla-api
+Play with tesla APIs
+
+cloned from https://github.com/lephisto/tesla-apiscraper
+
+
+
+
 # tesla-apiscraper
 Selfhosted API Scraper for pulling Vehicle Telemetry from the Tesla Owner API into an InfluxDB visualisation on Grafana Dashboards.
 
