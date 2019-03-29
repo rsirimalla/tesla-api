@@ -20,15 +20,14 @@
 
 import sys
 import time
-import urllib2
+import urllib.request as urllib2
 import teslajson
 import logging
 import threading
 import json
-import Queue
+from multiprocessing import Queue
 
-from BaseHTTPServer import HTTPServer
-from BaseHTTPServer import BaseHTTPRequestHandler
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
 from srtmread import elevationtoinflux
 
@@ -43,10 +42,10 @@ a_ignore = ["media_state", "software_update", "speed_limit_mode"]
 
 
 
-postq = Queue.Queue()
+postq = Queue()
 http_condition = threading.Condition()
 
-poll_interval = 1   # Set to -1 to wakeup the Car on Scraper start
+poll_interval = -1   # Set to -1 to wakeup the Car on Scraper start
 asleep_since = 0
 is_asleep = ''
 disableScrape = a_start_disabled
@@ -407,7 +406,7 @@ while True:
             disableScrape = req['value']
             if not disableScrape:
                 logger.info("Resume Scrape requested")
-                poll_interval = 1
+                poll_interval = 30
                 disabledsince=0
                 resume = True
             else:
@@ -469,12 +468,12 @@ while True:
                 resume = False
         elif poll_interval < 0:
             state_monitor.wake_up()
-            poll_interval = 1
+            poll_interval = 30
         tosleep = poll_interval
         processingtime = int(time.time()) - busysince
         # If we spent too much time in processing, warn here
         # Reasons might be multiple like say slow DB or slow tesla api
-        if processingtime > 10:
+        if processingtime > 60:
             logger.info("Too long processing loop: " + str(processingtime) +
                         " seconds... Tesla server or DB slow?")
         logger.info("Asleep since: " + str(asleep_since) +
